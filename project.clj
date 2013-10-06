@@ -10,7 +10,6 @@
                  [compojure "1.1.5"]
                  [ring/ring-json "0.2.0"]
                  [ring/ring-jetty-adapter "1.2.0"]]
-  :main lds-scriptures-api.core
 
   :plugins [[lein-ring "0.8.5"]]
   :ring {:handler lds-scriptures-api.handler/app}

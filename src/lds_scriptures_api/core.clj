@@ -8,5 +8,4 @@
   (println x "Hello, World!"))
 
 (defn -main [& args]
-  (println (works))
   (println (count (db/get-chapter 1 :1_ne :bm))))
