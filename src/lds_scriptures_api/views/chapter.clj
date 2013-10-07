@@ -1,8 +1,6 @@
 (ns lds-scriptures-api.views.chapter
   (:require [lds-scriptures-api.db :as db]))
 
-(def verse-list (atom []))
-
 ;; Verses
 (defn template [v s]
   {:title       (v :verse_title)
@@ -11,6 +9,7 @@
    :verse       s })
 
 (defn render [chapter book volume]
+  (def verse-list (atom []))
   (let [c (db/get-chapter chapter book volume)]
     (if (nil? c)
       ;; Not found
