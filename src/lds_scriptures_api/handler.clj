@@ -36,12 +36,11 @@
       ;; Render
       {:body (volume/render volume)})
 
-
   ;; Books
   (GET (str api-version "/:volume/:book/")
     [volume book]
       {:body (book/render book)})
-  (GET (str api-version "/:volume/:book/")
+  (GET (str api-version "/:volume/:book")
     [volume book]
       {:body (book/render book)})
 
@@ -62,7 +61,8 @@
       {:body (verse/render verses chapter book volume)})
 
   ;; 404
-  (route/not-found "Site map: /api/v1/:volume/:book/:chapter/:verse/"))
+  (route/not-found (str "Site map: /api/v1/:volume/:book/:chapter/:verse/"
+                    "\n\nVolumes: ot, nt, bm, dc, pgp")))
 
 ;; Create the App here
 (def app

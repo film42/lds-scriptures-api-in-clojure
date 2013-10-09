@@ -1,7 +1,8 @@
 (ns lds-scriptures-api.views.volume
-  (:require [lds-scriptures-api.db :as db]))
+  (:require [lds-scriptures-api.db :as db]
+            [lds-scriptures-api.views.book :as book]))
 
-(defn template [v books]
+(defn template [v]
   {:title      (v :volume_title)
    :title_long (v :volume_title_long)
    :subtitle   (v :volume_subtitle)
@@ -15,4 +16,4 @@
       ;; Not found
       {:error "Not found"}
       ;; Render
-      (template v nil))))
+      (conj {:books (book/render-books volume)} (template v) ))))

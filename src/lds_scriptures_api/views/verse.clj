@@ -16,7 +16,7 @@
   (inc -id))
 
 (defn render [verses chapter book volume]
-  (let [v (db/get-verse (read-string verses) (read-string chapter) book volume)]
+  (let [v (db/get-verse verses chapter book volume)]
     (if (nil? v)
       ;; Not found
       {:error "Not found"}

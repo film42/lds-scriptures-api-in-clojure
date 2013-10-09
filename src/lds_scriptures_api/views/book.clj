@@ -10,6 +10,18 @@
    :chapters    (b :num_chapters)
    :verses      (b :num_verses)})
 
+(defn render-books [volume]
+  (def book-list (atom []))
+  (let [b (db/get-books volume)]
+    (if (nil? b)
+      ;; Not found
+      {:error "Not found"}
+      ;; Render
+      (doseq [i (range (count b))]
+        (swap! book-list conj (template (b i))))))
+  ;; Return the Atom (fix)
+  @book-list)
+
 (defn render [book]
   (let [b (db/get-book book)]
     (if (nil? b)

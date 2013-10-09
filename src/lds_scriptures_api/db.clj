@@ -1,15 +1,39 @@
 (ns lds-scriptures-api.db
   (:require [korma.db :as korma]
-            [korma.core :as kc]))
+            [korma.core :as kc]
+            [clojure.string :as string])
+  (:import (java.net URI)))
+
+;;
+;; Database Herlpers
+;;
+(def db-local
+  "postgresql://film42:none@localhost:5432/lds_scriptures")
+
+(def db-production
+  (System/getenv "DATABASE_URL"))
+
+(def db-postrgres-uri
+  (if (not (nil? db-production))
+    db-production
+    db-local))
+
+(defn set-app-pg-db! []
+  (let [db-uri (java.net.URI. db-postrgres-uri)]
+    (->> (string/split (.getUserInfo db-uri) #":")
+      (#(identity {:db (last (string/split db-postrgres-uri #"\/"))
+                   :host (.getHost db-uri)
+                   :port (.getPort db-uri)
+                   :user (% 0)
+                   :password (% 1)}))
+      (korma/postgres)
+      (korma/defdb db))))
 
 ;;
 ;; Database Config
 ;;
-(def db-sqlite-config
-  {:db "scriptures.sqlite3"})
 
-(korma/defdb db
-  (korma/sqlite3 db-sqlite-config))
+(set-app-pg-db!)
 
 ;;
 ;; Model Definitions
@@ -70,31 +94,42 @@
     (first (kc/select books
       (kc/where {:lds_org b})))))
 
+(defn get-books
+  "Get all books for a volume"
+  [volume]
+  (let [v (get-volume volume)]
+    (try
+      (kc/select books
+        (kc/where {:volume_id (v :id)}))
+      (catch NullPointerException e))))
+
 (defn get-chapter
   "Optimized get chapter, this time no joins"
   [chapter book volume]
   ;; Sanitize inputs
-  (let [c (if (integer? chapter) chapter (name chapter)),
+  (let [c (if (string? chapter) chapter (Long/toString chapter)),
         b (get-book book),
         v (get-volume volume)]
     (try
       (kc/select verses
         (kc/where {:book_id (b :id),
                    :volume_id (v :id),
-                   :chapter c}))
-      (catch NullPointerException e))))
+                   :chapter (read-string chapter)}))
+      (catch NullPointerException e nil))))
 
 (defn get-verse
   "Get a verse with a book, volume, and scripture"
   ([verse chapter book volume]
   (let [res (get-chapter chapter book volume)]
     ;; Return the index of the verse
-    (try
-      (res (dec verse))
-      (catch Exception e nil))))
+    (if (not (nil? res))
+      (try
+        (res (dec (read-string verse)))
+        (catch Exception e nil)))))
   ;; Chaining
   ([verse verses]
     ;; Return the index of the verse
     (try
       (verses (dec verse))
       (catch Exception e nil))))
+
