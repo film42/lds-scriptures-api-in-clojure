@@ -1,43 +1,27 @@
 (ns lds-scriptures-api.db
+  (:use clj-bonecp-url.core)
   (:require [korma.db :as korma]
             [korma.core :as kc]
             [clojure.string :as string])
   (:import (java.net URI)))
 
-;;
-;; Database Herlpers
-;;
-(def db-local
-  "postgresql://film42:none@localhost:5432/lds_scriptures")
-
-(def db-production
-  (System/getenv "DATABASE_URL"))
-
-(def db-postrgres-uri
-  (if (not (nil? db-production))
-    db-production
-    db-local))
-
-(defn set-app-pg-db! []
-  (let [db-uri (java.net.URI. db-postrgres-uri)]
-    (->> (string/split (.getUserInfo db-uri) #":")
-      (#(identity {:db (last (string/split db-postrgres-uri #"\/"))
-                   :host (.getHost db-uri)
-                   :port (.getPort db-uri)
-                   :user (% 0)
-                   :password (% 1)}))
-      (korma/postgres)
-      (korma/defdb db))))
 
 ;;
 ;; Database Config
 ;;
 
-(set-app-pg-db!)
+(def datasource
+  (datasource-from-url
+    (or (System/getenv "DATABASE_URL")
+        "postgres://film42:none@localhost:5432/lds_scriptures")))
+
+(when (nil? @korma/_default)
+  (korma/default-connection {:pool {:datasource datasource}}))
 
 ;;
 ;; Model Definitions
 ;;
+
 (declare verses books volumes)
 
 (kc/defentity verses
@@ -50,8 +34,7 @@
   (kc/entity-fields :chapter :pilcrow :verse_scripture :verse_title :verse_title_short)
 
   ;; Meta
-  (kc/table :verses)
-  (kc/database db))
+  (kc/table :verses))
 
 (kc/defentity books
   ;; Associations
@@ -63,8 +46,7 @@
   (kc/entity-fields :book_title :book_title_jst :book_title_long :book_title_short :book_subtitle :lds_org :num_chapters :num_verses)
 
   ;; Meta
-  (kc/table :books)
-  (kc/database db))
+  (kc/table :books))
 
 (kc/defentity volumes
   ;; Associations
@@ -76,8 +58,7 @@
   (kc/entity-fields :volume_title :volume_title_long :volume_subtitle :lds_org :num_chapters :num_verses)
 
   ;; Meta
-  (kc/table :volumes)
-  (kc/database db))
+  (kc/table :volumes))
 
 ;; Interface
 (defn get-volume
@@ -132,4 +113,3 @@
     (try
       (verses (dec verse))
       (catch Exception e nil))))
-
