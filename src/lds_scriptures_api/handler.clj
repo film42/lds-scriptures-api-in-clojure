@@ -53,12 +53,9 @@
       {:body (chapter/render chapter book volume)})
 
   ;; Verses
-  (GET (str api-version "/:volume/:book/:chapter/:verses/")
-    [volume book chapter verses]
-      {:body (verse/render verses chapter book volume)})
-  (GET (str api-version "/:volume/:book/:chapter/:verses")
-    [volume book chapter verses]
-      {:body (verse/render verses chapter book volume)})
+  (GET (str api-version "/:volume/:book/:chapter/:verses*")
+    [volume book chapter verses & query]
+      {:body (verse/render verses chapter book volume (query :*))})
 
   ;; 404
   (route/not-found (str "Site map: /api/v1/:volume/:book/:chapter/:verse/"

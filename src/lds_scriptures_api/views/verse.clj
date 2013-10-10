@@ -26,8 +26,8 @@
   (set
     (apply concat (build-param-tree params))))
 
-(defn render [verses chapter book volume]
-  (let [vset (get-parsed-verses verses)]
+(defn render [verses chapter book volume query]
+  (let [vset (get-parsed-verses (str verses query))]
     (let [v (vec (db/get-verses vset chapter book volume))]
       (if (= 0 (count v))
         ;; Not found
