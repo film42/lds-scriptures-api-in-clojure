@@ -9,14 +9,10 @@
    :verse       s })
 
 (defn render [chapter book volume]
-  (def verse-list (atom []))
   (let [c (db/get-chapter chapter book volume)]
     (if (nil? c)
       ;; Not found
       {:error "Not found"}
       ;; Render
-      (doseq [i (range (count c))]
-        (swap! verse-list conj (template (c i) (+ i 1))))))
-  ;; Return the Atom (fix)
-  @verse-list)
-
+      (for [i (range (count c))]
+        (template (c i) (+ i 1))))))

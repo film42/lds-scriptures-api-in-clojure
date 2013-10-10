@@ -113,3 +113,15 @@
     (try
       (verses (dec verse))
       (catch Exception e nil))))
+
+(defn get-verses
+  "Get verses with a set of verse numbers"
+  [verses chapter book volume]
+  (let [res (get-chapter chapter book volume)]
+    (if (not (nil? res))
+      (filter (fn [x] (not (nil? x)))
+        (for [v verses]
+          (try
+            (res (dec v))
+            (catch Exception e))))
+      [])))
