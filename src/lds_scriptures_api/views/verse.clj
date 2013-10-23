@@ -8,7 +8,7 @@
     {:title       (v :verse_title)
      :title_short (v :verse_title_short)
      :text        (v :verse_scripture)
-     :verse       s}))
+     :verse       (read-string s)}))
 
 (defn build-param-tree
   "Create a param tree for looking up verses"
