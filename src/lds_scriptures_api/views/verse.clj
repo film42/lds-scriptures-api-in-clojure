@@ -10,24 +10,20 @@
      :text        (v :verse_scripture)
      :verse       (read-string s)}))
 
-(defn build-param-tree
-  "Create a param tree for looking up verses"
+(defn get-param-tree-as-list
+  "Create a param tree for looking up verses, concat to single list"
   [params]
-  (let [focus (split params #",")]
-    (for [i (range (count focus))]
-      (let [ranges (split (focus i) #"-")]
-        (if (= 1 (count ranges))
-            (list (read-string (first ranges)))
-            (range (read-string (ranges 0)) (inc (read-string (ranges 1)))))))))
-
-(defn get-parsed-verses
-  "Create a set of verses from params"
-  [params]
-  (set
-    (apply concat (build-param-tree params))))
+  (apply concat
+    (let [focus (split params #",")]
+      (for [i (range (count focus))]
+        (let [ranges (split (focus i) #"-")]
+          (if (= 1 (count ranges))
+              (list (read-string (first ranges)))
+              (range (read-string (ranges 0))
+                     (inc (read-string (ranges 1))))))))))
 
 (defn render [verses chapter book volume query]
-  (let [vset (get-parsed-verses (str verses query))]
+  (let [vset (get-param-tree-as-list (str verses query))]
     (let [v (vec (db/get-verses vset chapter book volume))]
       (if (= 0 (count v))
         ;; Not found
