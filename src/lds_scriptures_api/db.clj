@@ -93,6 +93,7 @@
         v (get-volume volume)]
     (try
       (kc/select verses
+        (kc/order :verse :ASC)
         (kc/where {:book_id (b :id),
                    :volume_id (v :id),
                    :chapter (read-string chapter)}))
