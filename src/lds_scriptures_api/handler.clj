@@ -26,6 +26,11 @@
 
 ;; App Routes, basically an ANY but easier to debug
 (defroutes app-routes
+  ;; Search
+  (GET (str api-version "/search*")
+    {params :params} []
+      {:body (verse/render-search (get params :query))})
+
   ;; Volumes
   (GET (str api-version "/:volume/")
     [volume]
@@ -59,7 +64,8 @@
 
   ;; 404
   (route/not-found (str "Site map: /api/v1/:volume/:book/:chapter/:verse/"
-                    "\n\nVolumes: ot, nt, bm, dc, pgp")))
+                        "\n\nSearch: /api/v1/search?query=boat"
+                        "\n\nVolumes: ot, nt, bm, dc, pgp")))
 
 ;; Create the App here
 (def app

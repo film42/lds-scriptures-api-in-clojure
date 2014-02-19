@@ -22,6 +22,16 @@
               (range (read-string (ranges 0))
                      (inc (read-string (ranges 1))))))))))
 
+(defn render-search [query]
+  (let [v (vec (db/search query))]
+    (if (= 0 (count v))
+        ;; Not found
+        {:error "No :query param provided"}
+        ;; Render)
+        (vec
+          (for [i (range (count v))]
+            (template (v i)))))))
+
 (defn render [verses chapter book volume query]
   (let [vset (get-param-tree-as-list (str verses query))]
     (let [v (vec (db/get-verses vset chapter book volume))]

@@ -13,7 +13,7 @@
 (def datasource
   (datasource-from-url
     (or (System/getenv "DATABASE_URL")
-        "postgres://film42:none@localhost:5432/lds_scriptures")))
+        "postgres://film42:none@localhost:5432/scriptures")))
 
 (when (nil? @korma/_default)
   (korma/default-connection {:pool {:datasource datasource}}))
@@ -126,3 +126,10 @@
             (res (dec v))
             (catch Exception e))))
       [])))
+
+(defn search
+  "Query against the database using the vectorized verses"
+  [query]
+  (let [sql "SELECT \"verses\".* FROM \"verses\" WHERE (verseText @@ plainto_tsquery('english', ?))"]
+    (kc/exec-raw [sql [query]] :results)))
+
