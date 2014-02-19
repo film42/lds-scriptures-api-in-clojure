@@ -1,17 +1,18 @@
 (ns lds-scriptures-api.views.verse
-  (:use [clojure.string :only [split lower-case replace]])
+  (:use [clojure.string :only [split lower-case]])
+  (:require [clojure.string :only [replace] :as cstr])
   (:require [lds-scriptures-api.db :as db]))
 
 (defn underscore
   "Replace all spaces with underscores"
-  [& w] (replace (reduce str w) #" " "_"))
+  [& w] (cstr/replace (reduce str w) #" " "_"))
 
 (defn parse-book-slug
   "Regex lookup for the book slug of a verse title (short)"
   [title]
   (let [cleaned (-> title
-                    (replace #"-" "_")
-                    (replace #"&" ""))]
+                    (cstr/replace #"-" "_")
+                    (cstr/replace #"&" ""))]
     (let [p (re-matches #"(\d*)\s*([\w|\s]+)[\.|\s].*" cleaned)]
       (if (empty? (second p))
         (underscore (lower-case (nth p 2)))
