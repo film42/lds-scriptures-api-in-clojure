@@ -1,6 +1,21 @@
 (ns lds-scriptures-api.views.verse
-  (:use [clojure.string :only [split]])
+  (:use [clojure.string :only [split lower-case replace]])
   (:require [lds-scriptures-api.db :as db]))
+
+(defn underscore
+  "Replace all spaces with underscores"
+  [& w] (replace (reduce str w) #" " "_"))
+
+(defn parse-book-slug
+  "Regex lookup for the book slug of a verse title (short)"
+  [title]
+  (let [cleaned (-> title
+                    (replace #"-" "_")
+                    (replace #"&" ""))]
+    (let [p (re-matches #"(\d*)\s*([\w|\s]+)[\.|\s].*" cleaned)]
+      (if (empty? (second p))
+        (underscore (lower-case (nth p 2)))
+        (underscore (second p) " " (lower-case (nth p 2)))))))
 
 ;; Verses
 (defn template [v]
@@ -9,6 +24,16 @@
      :title_short (v :verse_title_short)
      :text        (v :verse_scripture)
      :verse       (read-string s)}))
+
+;; Search Verse
+(defn search-template [v]
+  (let [s (last (split (v :verse_title) #":"))]
+    {:title       (v :verse_title)
+     :title_short (v :verse_title_short)
+     :text        (v :verse_scripture)
+     :verse       (read-string s)
+     :chapter     (v :chapter)
+     :book        (parse-book-slug (v :verse_title_short))}))
 
 (defn get-param-tree-as-list
   "Create a param tree for looking up verses, concat to single list"
@@ -30,7 +55,7 @@
         ;; Render)
         (vec
           (for [i (range (count v))]
-            (template (v i)))))))
+            (search-template (v i)))))))
 
 (defn render [verses chapter book volume query]
   (let [vset (get-param-tree-as-list (str verses query))]
