@@ -1,4 +1,4 @@
-(ns lds-scriptures-api.rest)
+(ns lds-scriptures-api.middleware)
 
 ;; Define the CORS set, this will allow everything from everyone
 (def cors-headers
@@ -24,3 +24,12 @@
 ;; Wrap-Json because we need to
 (defn wrap-json [handler]
   (generic-request handler json-headers))
+
+;; Ignore trailing slash
+(defn with-ignore-trailing-slash [handler]
+  (fn [request]
+    (let [uri       (request :uri)
+          clean-uri (if (and (not (= "/" uri)) (.endsWith uri "/"))
+                      (subs uri 0 (- (count uri) 1))
+                      uri)]
+      (handler (assoc request :uri clean-uri)))))

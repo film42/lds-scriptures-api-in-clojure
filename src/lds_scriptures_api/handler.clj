@@ -1,11 +1,11 @@
 (ns lds-scriptures-api.handler
-  (:use lds-scriptures-api.rest)
+  (:use lds-scriptures-api.middleware)
   (:use compojure.core)
   (:use ring.util.response)
   (:use ring.adapter.jetty)
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
-            [ring.middleware.json :as middleware]
+            [ring.middleware.json :as rmw]
             [lds-scriptures-api.views.volume :as volume]
             [lds-scriptures-api.views.book :as book]
             [lds-scriptures-api.views.chapter :as chapter]
@@ -32,27 +32,17 @@
       {:body (verse/render-search (get params :query))})
 
   ;; Volumes
-  (GET (str api-version "/:volume/")
-    [volume]
-      ;; Render
-      {:body (volume/render volume)})
   (GET (str api-version "/:volume")
     [volume]
       ;; Render
       {:body (volume/render volume)})
 
   ;; Books
-  (GET (str api-version "/:volume/:book/")
-    [volume book]
-      {:body (book/render book)})
   (GET (str api-version "/:volume/:book")
     [volume book]
       {:body (book/render book)})
 
   ;; Chapter
-  (GET (str api-version "/:volume/:book/:chapter/")
-    [volume book chapter]
-      {:body (chapter/render chapter book volume)})
   (GET (str api-version "/:volume/:book/:chapter")
     [volume book chapter]
       {:body (chapter/render chapter book volume)})
@@ -70,6 +60,7 @@
 ;; Create the App here
 (def app
   (-> (handler/api app-routes)
-      (middleware/wrap-json-response)
+      (rmw/wrap-json-response)
+      (with-ignore-trailing-slash)
       (wrap-json)
       (wrap-cors)))
