@@ -6,6 +6,7 @@
   {:title       (v :verse_title)
    :title_short (v :verse_title_short)
    :text        (v :verse_scripture)
+   :edition        (v :edition)
    :verse       s })
 
 (defn render [chapter book volume]

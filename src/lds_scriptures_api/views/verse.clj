@@ -24,6 +24,7 @@
     {:title       (v :verse_title)
      :title_short (v :verse_title_short)
      :text        (v :verse_scripture)
+     :edition     (v :edition)
      :verse       (read-string s)}))
 
 ;; Search Verse
@@ -32,6 +33,7 @@
     {:title       (v :verse_title)
      :title_short (v :verse_title_short)
      :text        (v :verse_scripture)
+     :edition     (v :edition)
      :verse       (read-string s)
      :chapter     (v :chapter)
      :book        (parse-book-slug (v :verse_title_short))}))
