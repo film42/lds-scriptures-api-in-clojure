@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Scripture Diff</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/bootstrap.css" type="text/css" media="screen" title="no title" charset="utf-8">
+
+    <script type="text/javascript" src="js/jquery-1.11.0.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/jsdiff.js" charset="utf-8"></script>
+
+    <style type="text/css" media="screen">
+      ins {
+        background: #E6FFE6;
+      }
+      del {
+        background: #FFE6E6;
+      }
+      h3 {
+        background: #efefef;
+        padding: 20px;
+        margin: 0;
+      }
+      hr {
+        margin: 0;
+        border-bottom: 1px solid #D3D1D1;
+      }
+      ol li {
+        padding: 20px 5px;
+        border-bottom: 1px solid #efefef;
+        margin: 0 0 0 10px;
+      }
+      ul {
+        margin: 0;
+      }
+      ul li {
+        padding: 5px;
+        list-style-type: none;
+      }
+      a {
+        cursor: pointer;
+      }
+      .subtitle {
+        background: #FFFAED;
+        padding: 10px 20px;
+        border-bottom: 1px solid #D3D1D1;
+      }
+    </style>
+  </head>
+  <body>
+    <h3></h3>
+    <hr>
+    <ol>
+    </ol>
+  </body>
+
+  <script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      var url = "http://scripture-api.herokuapp.com/api/v1/bm";
+
+      function renderBookList() {
+
+        function chapterTemplate(title, book, numOfChapters) {
+          var template = "<ul>"
+          for(var i = 0; i < numOfChapters; i++) {
+            template += "<li>";
+            template += "<a title='" + title + "' chapter='" + (i + 1) +
+                        "' book='" + book + "' class='book-link'>Chapter " +
+                         (i + 1) + "</a>";
+            template += "</li>";
+          }
+          template += "</ul>";
+          return template;
+        }
+
+        function bookTemplate(book) {
+          var template = "<li>";
+          template += "<b>" + book.title + "</b>";
+          template += chapterTemplate(book.title, book.slug, book.chapters);
+          template += "</li>";
+          return template;
+        }
+
+        $.getJSON(url, function(data) {
+          // Clear and Setup
+          $('body').html('<h3></h3><hr><p class="subtitle"></p><ol></ol>');
+          $('h3').text("Book of Mormon 1830 Diff - Index");
+          $('p').html("This tool compares the 1830 Book of Mormon with the " +
+                      "1989 edition."
+                      + "<a href='http://twitter.com/film42'> Made by @film42</a>");
+
+          data.books.forEach(function(book) {
+            $('ol').append( bookTemplate(book) );
+          });
+
+          $('.book-link').on('click', function(e) {
+            var el = e.target;
+            var chapter = $(el).attr('chapter');
+            var book = $(el).attr('book');
+            var title = $(el).attr('title');
+
+            renderChapter(title, book, chapter);
+          });
+        });
+      }
+
+      function renderChapter(title, book, chapter) {
+
+        function appendDiff(text) {
+          $('ol').append("<li>" + text + "</li>" );
+        }
+
+        var base = url + '/' + book + '/' + chapter + '/';
+        var ch1_1989 = $.getJSON(base);
+        var ch1_1830 = $.getJSON(base + '?edition=1830');
+
+        $.when(ch1_1989, ch1_1830).done(function(f,s) {
+          var newer = f[0];
+          var older = s[0];
+
+          // Clear and Setup
+          $('body').html('<h3></h3><hr><ol></ol>');
+          $('h3').text(title + ' - Chapter ' + chapter);
+          $('h3').append("<div class='pull-right'><a href=''>Back</button></div>");
+
+          // Run and Add
+          $(newer).each(function(k, v) {
+            var html = diffString( older[k].text, newer[k].text );
+            appendDiff(html);
+          });
+        });
+      }
+
+      //
+      // Init
+      //
+      renderBookList();
+
+    });
+  </script>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-49750137-1', 'film42.us');
+    ga('send', 'pageview');
+  </script>
+</html>
