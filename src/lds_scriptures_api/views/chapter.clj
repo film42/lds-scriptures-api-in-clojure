@@ -9,8 +9,8 @@
    :edition     (v :edition)
    :verse       s })
 
-(defn render [chapter book volume]
-  (let [c (db/get-chapter chapter book volume)]
+(defn render [chapter book volume ed]
+  (let [c (db/get-chapter chapter book volume ed)]
     (if (nil? c)
       ;; Not found
       {:error "Not found"}

@@ -1,0 +1,55 @@
+(ns lds-scriptures-api.parser.dictionary)
+
+(def books [
+   "/tmp/bom/1-nephi/index.html"
+   "/tmp/bom/2-nephi/index.html"
+   "/tmp/bom/3-nephi/index.html"
+   "/tmp/bom/4-nephi/index.html"
+   "/tmp/bom/alma/index.html"
+   "/tmp/bom/enos/index.html"
+   "/tmp/bom/ether/index.html"
+   "/tmp/bom/helaman/index.html"
+   "/tmp/bom/jacob/index.html"
+   "/tmp/bom/jarom/index.html"
+   "/tmp/bom/mormon/index.html"
+   "/tmp/bom/moroni/index.html"
+   "/tmp/bom/mosiah/index.html"
+   "/tmp/bom/omni/index.html"
+   "/tmp/bom/words-mormon/index.html"
+])
+
+(def tite->short {
+  "1 Nephi" "1 Ne."
+  "2 Nephi" "2 Ne."
+  "3 Nephi" "3 Ne."
+  "4 Nephi" "4 Ne."
+  "Alma" "Alma"
+  "Enos" "Enos"
+  "Ether" "Ether"
+  "Helaman" "Hel."
+  "Jacob" "Jacob"
+  "Jarom" "Jarom"
+  "Mormon" "Morm."
+  "Moroni" "Moro."
+  "Mosiah" "Mosiah"
+  "Omni" "Omni"
+  "Words of Mormon" "W of M"
+})
+
+(def tite->slug {
+  "1 Nephi" "1_ne"
+  "2 Nephi" "2_ne"
+  "3 Nephi" "3_ne"
+  "4 Nephi" "4_ne"
+  "Alma" "alma"
+  "Enos" "enos"
+  "Ether" "ether"
+  "Helaman" "hel"
+  "Jacob" "jacob"
+  "Jarom" "jarom"
+  "Mormon" "morm"
+  "Moroni" "moro"
+  "Mosiah" "mosiah"
+  "Omni" "omni"
+  "Words of Mormon" "w_of_m"
+})

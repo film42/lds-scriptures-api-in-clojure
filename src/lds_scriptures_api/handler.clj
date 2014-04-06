@@ -22,6 +22,11 @@
   {:status 204
    :body body})
 
+(defn- parse [p param-key]
+  (if (nil? (get p param-key))
+    "1989"
+    (get p param-key)))
+
 (def api-version "/api/v1")
 
 ;; App Routes, basically an ANY but easier to debug
@@ -44,8 +49,8 @@
 
   ;; Chapter
   (GET (str api-version "/:volume/:book/:chapter")
-    [volume book chapter]
-      {:body (chapter/render chapter book volume)})
+    [volume book chapter & params]
+      {:body (chapter/render chapter book volume (parse params :edition))})
 
   ;; Verses
   (GET (str api-version "/:volume/:book/:chapter/:verses*")
@@ -55,7 +60,8 @@
   ;; 404
   (route/not-found (str "Site map: /api/v1/:volume/:book/:chapter/:verse/"
                         "\n\nSearch: /api/v1/search?query=boat"
-                        "\n\nVolumes: ot, nt, bm, dc, pgp")))
+                        "\n\nVolumes: ot, nt, bm, dc, pgp"
+                        "\n\nUpdate 04/05/2014: You can now do `?edition=1830` for most bm functions")))
 
 ;; Create the App here
 (def app

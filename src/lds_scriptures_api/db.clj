@@ -22,7 +22,7 @@
 ;; Model Definitions
 ;;
 
-(declare verses books volumes)
+(declare verses new-verses books volumes)
 
 (kc/defentity verses
   ;; Associations
@@ -31,7 +31,18 @@
 
   ;; Attributes
   (kc/pk :id)
-  (kc/entity-fields :chapter :pilcrow :verse_scripture :verse_title :verse_title_short)
+  (kc/entity-fields :chapter :pilcrow :verse_scripture :verse_title :verse_title_short :edition)
+
+  ;; Meta
+  (kc/table :verses))
+
+(kc/defentity new-verses
+  ;; Associations
+  (kc/belongs-to books {:fk :book_id})
+  (kc/belongs-to volumes {:fk :volume_id})
+
+  ;; Attributes
+  (kc/entity-fields :chapter :pilcrow :verse_scripture :verse_title :verse_title_short :edition)
 
   ;; Meta
   (kc/table :verses))
@@ -86,7 +97,7 @@
 
 (defn get-chapter
   "Optimized get chapter, this time no joins"
-  [chapter book volume]
+  [chapter book volume ed]
   ;; Sanitize inputs
   (let [c (if (string? chapter) chapter (Long/toString chapter)),
         b (get-book book),
@@ -94,15 +105,16 @@
     (try
       (kc/select verses
         (kc/order :verse :ASC)
-        (kc/where {:book_id (b :id),
-                   :volume_id (v :id),
+        (kc/where {:book_id (b :id)
+                   :volume_id (v :id)
+                   :edition ed
                    :chapter (read-string chapter)}))
       (catch NullPointerException e nil))))
 
 (defn get-verse
   "Get a verse with a book, volume, and scripture"
-  ([verse chapter book volume]
-  (let [res (get-chapter chapter book volume)]
+  ([verse chapter book volume ed]
+  (let [res (get-chapter chapter book volume ed)]
     ;; Return the index of the verse
     (if (not (nil? res))
       (try
@@ -117,8 +129,8 @@
 
 (defn get-verses
   "Get verses with a set of verse numbers"
-  [verses chapter book volume]
-  (let [res (get-chapter chapter book volume)]
+  [verses chapter book volume ed]
+  (let [res (get-chapter chapter book volume ed)]
     (if (not (nil? res))
       (filter (fn [x] (not (nil? x)))
         (for [v verses]
@@ -133,3 +145,11 @@
   (let [sql "SELECT \"verses\".* FROM \"verses\" WHERE (verseText @@ plainto_tsquery('english', ?))"]
     (kc/exec-raw [sql [query]] :results)))
 
+
+;
+; Add Commands
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn add-verse [blob]
+  (kc/insert new-verses
+     (kc/values blob)))

@@ -8,6 +8,8 @@
                  [noir "1.3.0-beta3"]
                  [korma "0.3.0-RC5"]
 
+                 [enlive "1.1.5"]
+
                  [clj-bonecp-url "0.1.0"]
 
                  [org.xerial/sqlite-jdbc "3.7.2"]
