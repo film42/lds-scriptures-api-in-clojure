@@ -87,7 +87,8 @@
           $('h3').text("Book of Mormon 1830 Diff - Index");
           $('p').html("This tool compares the 1830 Book of Mormon with the " +
                       "1989 edition."
-                      + "<a href='http://twitter.com/film42'> Made by @film42</a>");
+                      + "<a href='http://twitter.com/film42'> Made by @film42</a> and "
+                      + "<a href='https://github.com/film42/lds-scriptures-api-in-clojure'> Source is on GitHub</a>.");
 
           data.books.forEach(function(book) {
             $('ol').append( bookTemplate(book) );
