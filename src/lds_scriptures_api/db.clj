@@ -79,6 +79,11 @@
     (first (kc/select volumes
       (kc/where {:lds_org v})))))
 
+(defn get-volumes
+  "Get all volumes in DB"
+  []
+  (vec (kc/select volumes)))
+
 (defn get-book
   "Get a book"
   [book]

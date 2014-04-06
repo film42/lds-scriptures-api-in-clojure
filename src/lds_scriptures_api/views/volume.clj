@@ -17,3 +17,8 @@
       {:error "Not found"}
       ;; Render
       (conj {:books (book/render-books volume)} (template v) ))))
+
+(defn render-all []
+  (let [vols (db/get-volumes)]
+    (vec
+     (map #(render (% :lds_org)) vols))))

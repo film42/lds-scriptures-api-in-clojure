@@ -31,6 +31,12 @@
 
 ;; App Routes, basically an ANY but easier to debug
 (defroutes app-routes
+    ;; Volumes
+  (GET (str api-version)
+    [volume]
+      ;; Render
+      {:body (volume/render-all)})
+
   ;; Search
   (GET (str api-version "/search*")
     {params :params} []
