@@ -94,30 +94,27 @@
   (->BookParser (file->html path)))
 
 
-(let [b (path->parser (books 0))]
-  (-> b verses first (verse-template (title b))))
-
-
-;(-> (books 9) path->parser (sql-format 14) db/add-verse)
-
 ;
-; Runner
+; Example Runner
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(doseq [b books]
-  ; Create parser from each file
-  (let [p (path->parser b)]
-    ; Map each verse to sql hash
-    (let [vs (sqlize p)]
-      (db/add-verse vs)
-      (println b))))
+;(doseq [b books]
+;  ; Create parser from each file
+;  (let [p (path->parser b)]
+;    ; Map each verse to sql hash
+;    (let [vs (sqlize p)]
+;      (db/add-verse vs)
+;      (println b))))
 
 ;
-; Example
+; More Examples
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;(doseq [path books]
 ;  (let [book (path->parser path)]
 ;    (println (str "Title: " (title book)
 ;                  "\t\t\t Verse Count: " (count (verses book))))))
+
+;(let [b (path->parser (books 0))]
+;  (-> b verses first (verse-template (title b))))
 
