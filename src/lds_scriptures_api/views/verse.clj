@@ -62,7 +62,7 @@
 
 (defn render [verses chapter book volume query]
   (let [vset (get-param-tree-as-list (str verses query))]
-    (let [v (vec (db/get-verses vset chapter book volume "1989"))]
+    (let [v (vec (db/get-verses vset chapter book volume "1981"))]
       (if (= 0 (count v))
         ;; Not found
         {:error "Not found"}

@@ -51,6 +51,7 @@
     <h3></h3>
     <hr>
     <ol>
+        <center><p>Loading...</p></center>
     </ol>
   </body>
 
@@ -86,7 +87,7 @@
           $('body').html('<h3></h3><hr><p class="subtitle"></p><ol></ol>');
           $('h3').text("Book of Mormon 1830 Diff - Index");
           $('p').html("This tool compares the 1830 Book of Mormon with the " +
-                      "1989 edition."
+                      "1981 edition."
                       + "<a href='http://twitter.com/film42'> Made by @film42</a> and "
                       + "<a href='https://github.com/film42/lds-scriptures-api-in-clojure'> Source is on GitHub</a>.");
 
@@ -112,10 +113,10 @@
         }
 
         var base = url + '/' + book + '/' + chapter + '/';
-        var ch1_1989 = $.getJSON(base);
+        var ch1_1981 = $.getJSON(base);
         var ch1_1830 = $.getJSON(base + '?edition=1830');
 
-        $.when(ch1_1989, ch1_1830).done(function(f,s) {
+        $.when(ch1_1981, ch1_1830).done(function(f,s) {
           var newer = f[0];
           var older = s[0];
 
