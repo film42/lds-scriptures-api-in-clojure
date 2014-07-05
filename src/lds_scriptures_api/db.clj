@@ -2,7 +2,8 @@
   (:use clj-bonecp-url.core)
   (:require [korma.db :as korma]
             [korma.core :as kc]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [clojure.edn :as edn])
   (:import (java.net URI)))
 
 
@@ -12,7 +13,7 @@
 
 (def datasource
   (datasource-from-url
-    (or (System/getenv "DATABASE_URL")
+    (or (System/getProperty "DATABASE_URL")
         "postgres://film42:none@localhost:5432/scriptures")))
 
 (when (nil? @korma/_default)
@@ -158,3 +159,44 @@
 (defn add-verse [blob]
   (kc/insert new-verses
      (kc/values blob)))
+
+
+; The Bomb
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defn- seq->slugs [col]
+  (map #(:lds_org %) col))
+
+(defprotocol
+    IExporter
+    (export [_ filename])
+    (dump [_])
+    (dump-volume [_ vol])
+    (dump-book [_ vol book])
+    (dump-chapter [_ vol book chapter]))
+
+(defrecord Exporter [edition]
+  IExporter
+
+  (export [_ filename]
+    (spit filename (pr-str (dump _))))
+
+  (dump [_]
+    (let [vol-slugs (seq->slugs (get-volumes))]
+      (map #(dump-volume _ %) vol-slugs)))
+
+  (dump-volume [_ vol]
+    (pmap #(dump-book _ vol %) (get-books vol)))
+
+  (dump-book [_ vol book]
+    (let [cs (:num_chapters book)
+          slug (:lds_org book)]
+      (map #(dump-chapter _ vol slug %) (range 1 (inc cs)))))
+  
+  (dump-chapter [_ vol book chapter]
+    (let [ch (get-chapter (str chapter) book vol (:edition _))]
+      (map #(apply dissoc % [:versetext]) ch))))
+
+(defn db->edn [edition filename]
+  (-> (->Exporter edition) (export filename)))
+
