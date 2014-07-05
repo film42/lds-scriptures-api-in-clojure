@@ -1,8 +1,6 @@
 (ns lds-scriptures-api.handler
   (:use lds-scriptures-api.middleware)
   (:use compojure.core)
-  (:use ring.util.response)
-  (:use ring.adapter.jetty)
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.json :as rmw]

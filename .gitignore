@@ -11,3 +11,5 @@ pom.xml.asc
 .lein-plugins
 .lein-repl-history
 .nrepl-report
+.nrepl-port
+appengine-web.xml # Not used, but leave out
